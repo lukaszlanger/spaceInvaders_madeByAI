@@ -47,6 +47,8 @@ bulletX_change = 0
 bulletY_change = 7  # Reduce speed
 bullet_state = "ready"
 
+explosions = []
+
 score_value = 0
 font = pygame.font.Font('freesansbold.ttf', 32)
 textX = 10
@@ -82,6 +84,20 @@ def fire_bullet(x, y):
 def isCollision(enemyX, enemyY, bulletX, bulletY):
     distance = math.sqrt(math.pow(enemyX - bulletX, 2) + math.pow(enemyY - bulletY, 2))
     return distance < 27
+
+
+def draw_explosions():
+    global explosions
+    new_explosions = []
+    for explosion in explosions:
+        x, y, timer = explosion
+        if timer < 30:  # Duration of the explosion
+            for _ in range(10):  # Number of particles
+                px = x + random.randint(-15, 15)
+                py = y + random.randint(-15, 15)
+                pygame.draw.circle(screen, (255, 0, 0), (px, py), 3)
+            new_explosions.append((x, y, timer + 1))
+    explosions = new_explosions
 
 
 running = True
@@ -137,6 +153,7 @@ while running:
             bulletY = playerY
             bullet_state = "ready"
             score_value += 1
+            explosions.append((enemyX[i], enemyY[i], 0))  # Add explosion
             enemyX[i] = random.randint(0, screen_width - 50)
             enemyY[i] = random.randint(50, 150)
 
@@ -151,5 +168,6 @@ while running:
         bulletY -= bulletY_change
 
     player(playerX, playerY)
+    draw_explosions()
     show_score(textX, textY)
     pygame.display.update()
