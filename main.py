@@ -10,9 +10,12 @@ screen_width = 1024
 screen_height = 768
 screen = pygame.display.set_mode((screen_width, screen_height))
 
+# Set up the clock for controlling FPS
+clock = pygame.time.Clock()
+
 # Load and scale the images
 background = pygame.image.load('background.png')
-background = pygame.transform.scale(background, (screen_width, screen_height))
+background = pygame.transform.scale(background, (200, 200))  # Scale background to a smaller logo
 
 playerImg = pygame.image.load('player.png')
 playerImg = pygame.transform.scale(playerImg, (50, 50))
@@ -33,15 +36,15 @@ for i in range(num_of_enemies):
     enemyImg.append(img)
     enemyX.append(random.randint(0, screen_width - 50))
     enemyY.append(random.randint(50, 150))
-    enemyX_change.append(4)
-    enemyY_change.append(40)
+    enemyX_change.append(2)  # Reduce speed
+    enemyY_change.append(20)
 
 bulletImg = pygame.image.load('bullet.png')
 bulletImg = pygame.transform.scale(bulletImg, (10, 30))
 bulletX = 0
 bulletY = playerY
 bulletX_change = 0
-bulletY_change = 10
+bulletY_change = 7  # Reduce speed
 bullet_state = "ready"
 
 score_value = 0
@@ -51,33 +54,44 @@ textY = 10
 
 over_font = pygame.font.Font('freesansbold.ttf', 64)
 
+
 def show_score(x, y):
     score = font.render("Score : " + str(score_value), True, (255, 255, 255))
     screen.blit(score, (x, y))
+
 
 def game_over_text():
     over_text = over_font.render("GAME OVER", True, (255, 255, 255))
     screen.blit(over_text, (screen_width // 2 - 200, screen_height // 2 - 32))
 
+
 def player(x, y):
     screen.blit(playerImg, (x, y))
 
+
 def enemy(x, y, i):
     screen.blit(enemyImg[i], (x, y))
+
 
 def fire_bullet(x, y):
     global bullet_state
     bullet_state = "fire"
     screen.blit(bulletImg, (x + 20, y + 10))
 
+
 def isCollision(enemyX, enemyY, bulletX, bulletY):
     distance = math.sqrt(math.pow(enemyX - bulletX, 2) + math.pow(enemyY - bulletY, 2))
     return distance < 27
 
+
 running = True
 while running:
+    # Limit the frame rate to 60 FPS
+    clock.tick(60)
+
     screen.fill((0, 0, 0))
-    screen.blit(background, (0, 0))
+    # Draw the smaller background logo at the center of the screen
+    screen.blit(background, ((screen_width - 200) // 2, (screen_height - 200) // 2))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -112,10 +126,10 @@ while running:
 
         enemyX[i] += enemyX_change[i]
         if enemyX[i] <= 0:
-            enemyX_change[i] = 4
+            enemyX_change[i] = 2  # Reduce speed
             enemyY[i] += enemyY_change[i]
         elif enemyX[i] >= screen_width - 50:
-            enemyX_change[i] = -4
+            enemyX_change[i] = -2  # Reduce speed
             enemyY[i] += enemyY_change[i]
 
         collision = isCollision(enemyX[i], enemyY[i], bulletX, bulletY)
